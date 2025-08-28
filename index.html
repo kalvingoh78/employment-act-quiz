@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1955年雇佣法令互动测试</title>
+    <!-- 使用'Inter'字体以获得干净现代的外观 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS用于样式和响应式设计 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .bg-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn-primary {
+            background-color: #1e40af;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-answer {
+            background-color: #e5e7eb;
+            color: #374151;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: left;
+            width: 100%;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+        .btn-answer:hover:not(.correct):not(.incorrect) {
+            background-color: #d1d5db;
+            transform: translateY(-2px);
+        }
+        .btn-answer.correct {
+            background-color: #10b981;
+            color: white;
+            animation: pulse-green 1s forwards;
+        }
+        .btn-answer.incorrect {
+            background-color: #ef4444;
+            color: white;
+            animation: shake-red 0.5s forwards;
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake-red {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .progress-bar {
+            height: 0.75rem;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background-color: #2563eb;
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .score-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e40af;
+            animation: grow 0.5s ease-out;
+        }
+        @keyframes grow {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+    <div id="app" class="container bg-card p-6 md:p-10 rounded-3xl shadow-lg mt-8">
+        <!-- 主应用程序容器 -->
+    </div>
+
+    <script>
+        // 从提供的文件中提取的问题和答案数组
+        const questions = [
+            {
+                question: "根据《1955年雇佣法令》，雇主与员工可以如何终止雇佣合同？",
+                options: [
+                    "只能通过支付赔偿金的方式",
+                    "只能通过发出通知的方式",
+                    "通过发出通知或支付通知金的方式",
+                    "只能由雇主单方面决定"
+                ],
+                correctAnswer: 2,
+                explanation: "根据《1955年雇佣法令》第12条，雇主和员工都可以通过发出通知或以支付通知金的方式终止雇佣合同。"
+            },
+            {
+                question: "根据该法令，如果员工的服务年限为5年及以上，终止合同的最低通知期是多少？",
+                options: [
+                    "4 周",
+                    "6 周",
+                    "8 周",
+                    "12 周"
+                ],
+                correctAnswer: 2,
+                explanation: "对于服务年限为5年及以上的员工，终止合同的通知期为8周。"
+            },
+            {
+                question: "当雇主对员工进行不当行为调查时，最长的暂停期和薪酬安排是？",
+                options: [
+                    "1周，全薪",
+                    "2周，半薪",
+                    "1个月，无薪",
+                    "3周，全薪"
+                ],
+                correctAnswer: 1,
+                explanation: "为了进行调查，雇主可以暂停员工工作，最长不超过2周，但必须支付员工该期间不少于其工资一半的报酬。"
+            },
+            {
+                question: "根据《1955年雇佣法令》，以下哪一项不属于合法的工资扣除？",
+                options: [
+                    "员工未提前通知离职应支付的赔偿金",
+                    "为员工过失造成的公司损失而扣除的罚款",
+                    "追回预支工资",
+                    "法定扣款项（如社保/税务等）"
+                ],
+                correctAnswer: 1,
+                explanation: "《雇佣法令》禁止雇主因员工过失或工作失误等原因单方面扣除罚款或赔偿金。"
+            },
+            {
+                question: "根据修正案，学徒合同的期限至少为多少个月？",
+                options: [
+                    "12个月",
+                    "24个月",
+                    "6个月",
+                    "1个月"
+                ],
+                correctAnswer: 2,
+                explanation: "根据2021年修正案，学徒合同的期限至少为6个月，最长为24个月。"
+            },
+            {
+                question: "根据《2010年吹哨人保护法》，如果有人对吹哨人进行报复，最高可被处以多少马币的罚款？",
+                options: [
+                    "50,000 马币",
+                    "100,000 马币",
+                    "1,000 马币",
+                    "500,000 马币"
+                ],
+                correctAnswer: 1,
+                explanation: "对吹哨人进行报复，可被处以不超过100,000马币的罚款或不超过2年的监禁，或两者并处。"
+            },
+            {
+                question: "根据《2010年个人数据保护法》，违反该法令或其条例的最高罚款是多少？",
+                options: [
+                    "50,000 马币",
+                    "100,000 马币",
+                    "500,000 马币",
+                    "1,000,000 马币"
+                ],
+                correctAnswer: 2,
+                explanation: "违反《2010年个人数据保护法》，可被处以不超过500,000马币的罚款或不超过3年的监禁，或两者并处。"
+            },
+            {
+                question: "根据《1955年雇佣法令》的修正，违反本法或总监命令的一般罚款从10,000马币增加到多少？",
+                options: [
+                    "20,000 马币",
+                    "30,000 马币",
+                    "50,000 马币",
+                    "100,000 马币"
+                ],
+                correctAnswer: 2,
+                explanation: "根据《1955年雇佣法令》的修正案（第99A条），本法下的犯罪和违反总干事决定或命令的一般罚款从10,000马币增加到50,000马币。"
+            },
+            {
+                question: "除了罚款之外，强迫劳动或债务劳动最高可被判处多少年监禁？",
+                options: [
+                    "1年",
+                    "2年",
+                    "3年",
+                    "5年"
+                ],
+                correctAnswer: 1,
+                explanation: "强迫劳动或债务劳动被视为非法。经定罪后，雇主可被处以不超过100,000马币的罚款或不超过2年的监禁，或两者并处。"
+            },
+            {
+                question: "以下哪一项是该文件中列出的与人力资源相关的法律？",
+                options: [
+                    "《1967年版权法》",
+                    "《1950年合同法》",
+                    "《2000年公司法》",
+                    "《2005年家庭法》"
+                ],
+                correctAnswer: 1,
+                explanation: "文件中列出了《1950年合同法》作为与人力资源相关的议会法案之一。"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizState = 'start'; // 'start', 'quiz', 'end'
+        const app = document.getElementById('app');
+
+        // 渲染开始界面
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="text-center">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">1955年雇佣法令互动测试</h1>
+                    <p class="text-gray-600 mb-8">根据您提供的培训材料，测试您对《1955年雇佣法令》核心内容的掌握情况。祝您好运！</p>
+                    <button id="start-btn" class="btn-primary">开始测试</button>
+                </div>
+            `;
+            document.getElementById('start-btn').addEventListener('click', () => {
+                quizState = 'quiz';
+                renderQuizScreen();
+            });
+        }
+
+        // 渲染问答界面
+        function renderQuizScreen() {
+            const currentQuestion = questions[currentQuestionIndex];
+            app.innerHTML = `
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800">第 ${currentQuestionIndex + 1} 题，共 ${questions.length} 题</h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-semibold text-gray-600">得分: <span id="score-count">${score}</span></span>
+                    </div>
+                </div>
+                <div class="progress-bar mb-8">
+                    <div id="progress-fill" class="progress-bar-fill" style="width: ${((currentQuestionIndex) / questions.length) * 100}%"></div>
+                </div>
+                <div class="mb-8">
+                    <p class="text-lg md:text-xl font-semibold text-gray-700 leading-relaxed">${currentQuestion.question}</p>
+                </div>
+                <div class="space-y-4" id="options-container">
+                    ${currentQuestion.options.map((option, index) => `
+                        <button class="btn-answer" data-index="${index}">${option}</button>
+                    `).join('')}
+                </div>
+            `;
+
+            // 为答案按钮添加事件监听器
+            document.querySelectorAll('.btn-answer').forEach(button => {
+                button.addEventListener('click', handleAnswerClick);
+            });
+        }
+
+        // 处理用户的答案
+        function handleAnswerClick(event) {
+            const selectedButton = event.target;
+            const selectedIndex = parseInt(selectedButton.getAttribute('data-index'));
+            const correctIndex = questions[currentQuestionIndex].correctAnswer;
+            const optionsContainer = document.getElementById('options-container');
+
+            // 选择答案后禁用所有按钮
+            optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+            // 检查答案是否正确
+            if (selectedIndex === correctIndex) {
+                selectedButton.classList.add('correct');
+                score += 10;
+                document.getElementById('score-count').textContent = score;
+            } else {
+                selectedButton.classList.add('incorrect');
+                const correctButton = optionsContainer.querySelector(`[data-index="${correctIndex}"]`);
+                correctButton.classList.add('correct');
+            }
+
+            // 显示解释和“下一题”按钮
+            const explanation = questions[currentQuestionIndex].explanation;
+            const nextButton = document.createElement('button');
+            nextButton.textContent = "下一题";
+            nextButton.className = "btn-primary mt-6 w-full";
+            nextButton.addEventListener('click', () => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    renderQuizScreen();
+                } else {
+                    quizState = 'end';
+                    renderEndScreen();
+                }
+            });
+
+            const explanationBox = document.createElement('div');
+            explanationBox.className = "mt-6 p-4 bg-gray-100 rounded-lg text-gray-800 border-l-4 border-gray-400";
+            explanationBox.innerHTML = `<p class="font-semibold">解释:</p><p>${explanation}</p>`;
+            
+            app.appendChild(explanationBox);
+            app.appendChild(nextButton);
+        }
+
+        // 渲染结束界面
+        function renderEndScreen() {
+            const finalScorePercentage = (score / (questions.length * 10)) * 100;
+            let message = "";
+            let messageColor = "";
+            
+            if (finalScorePercentage === 100) {
+                message = "完美得分！您是这方面的专家！";
+                messageColor = "text-green-600";
+            } else if (finalScorePercentage >= 70) {
+                message = "做得很好！您对材料有扎实的理解。";
+                messageColor = "text-blue-600";
+            } else if (finalScorePercentage >= 40) {
+                message = "不错的尝试！回顾材料以提高您的分数。";
+                messageColor = "text-yellow-600";
+            } else {
+                message = "继续学习！是时候复习基础知识了。";
+                messageColor = "text-red-600";
+            }
+
+            app.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">测试完成！</h2>
+                    <p class="text-gray-600 mb-2">您的最终得分是:</p>
+                    <p class="score-display mb-4">${score} / ${questions.length * 10}</p>
+                    <p class="text-xl font-semibold ${messageColor}">${message}</p>
+                    <button id="restart-btn" class="btn-primary mt-8">再试一次</button>
+                </div>
+            `;
+            document.getElementById('restart-btn').addEventListener('click', () => {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizState = 'start';
+                renderStartScreen();
+            });
+        }
+
+        // 根据状态初始渲染
+        if (quizState === 'start') {
+            renderStartScreen();
+        }
+
+    </script>
+</body>
+</html>
